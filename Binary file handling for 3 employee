@@ -1,0 +1,64 @@
+#include<iostream>
+#include<fstream>
+using namespace std;
+
+struct Employee {
+    char name[50];
+    int id;
+    float salary;
+};
+
+void writeToFile(const Employee employees[], int count) {
+    ofstream outFile("employee.dat", ios::binary);
+    if (!outFile) {
+        cerr << "error: could not open the file for writing" << endl;
+        return;
+    }
+    outFile.write(reinterpret_cast<const char*>(employees), sizeof(Employee) * count);
+    outFile.close();
+    cout << "Employee data written to binary file successfully!" << endl;
+}
+
+void readFromFile(int count) {
+    Employee employees[count];
+    ifstream inFile("employee.dat", ios::binary);
+    if (!inFile) {
+        cerr << "error: could not open the file for reading" << endl;
+        return;
+    }
+    inFile.read(reinterpret_cast<char*>(employees), sizeof(Employee) * count);
+    if (inFile) {
+        cout << "\nEmployee data read from binary file:" << endl;
+        for (int i = 0; i < count; ++i) {
+            cout << "\nEmployee " << i + 1 << " Details:" << endl;
+            cout << "Name: " << employees[i].name << endl;
+            cout << "ID: " << employees[i].id << endl;
+            cout << "Salary: " << employees[i].salary << endl;
+        }
+    } else {
+        cerr << "error: could not read data from the binary file!" << endl;
+    }
+    inFile.close();
+}
+
+int main() {
+    const int employeeCount = 3;
+    Employee employees[employeeCount];
+
+    cout << "Enter details for " << employeeCount << " employees:" << endl;
+    for (int i = 0; i < employeeCount; ++i) {
+        cout << "\nEmployee " << i + 1 << ":" << endl;
+        cout << "Name: ";
+        cin.ignore();
+        cin.getline(employees[i].name, 50);
+        cout << "ID: ";
+        cin >> employees[i].id;
+        cout << "Salary: ";
+        cin >> employees[i].salary;
+    }
+
+    writeToFile(employees, employeeCount);
+    readFromFile(employeeCount);
+
+    return 0;
+}
